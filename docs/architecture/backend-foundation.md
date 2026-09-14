@@ -1,14 +1,14 @@
 # Backend foundation
 
-One Java 21 / Spring Boot 4.1.1 Maven deployable forms a modular monolith. PostgreSQL 17 is the system of record. pgvector 0.8.2 is installed through Flyway V1, with no embeddings or domain tables. Flyway owns schema changes; Hibernate uses validation, and open-session-in-view is disabled.
+One Java 21 / Spring Boot 4.1.1 Maven deployable forms a modular monolith. PostgreSQL 17 is the system of record. pgvector 0.8.2 is installed through Flyway V1, with no embeddings. Prompt 002 adds the [market and retailer foundation](market-retailer-foundation.md) through V2. Flyway owns schema changes; Hibernate uses validation, and open-session-in-view is disabled.
 
 ## Boundaries
 
 `com.coupleoutfit.CoupleOutfitApplication` bootstraps the application. Only needed cross-cutting packages exist: `shared.api`, `shared.observability`, and `shared.security`. Do not add placeholder classes to retain empty packages.
 
-Future features use `api → application → domain`. Infrastructure implements application/domain ports. Domains must not depend on MVC, provider SDKs, JPA repository implementations or transport DTOs. Add focused architecture enforcement when real feature modules exist; no speculative ArchUnit rules or generic CRUD base types are included now. Feature concerns stay in their owning modules rather than accumulating in `shared`.
+Future features use `api → application → domain`. Infrastructure implements application/domain ports. Domains must not depend on MVC, provider SDKs, JPA repository implementations or transport DTOs. ArchUnit now enforces the market/retailer domain and application boundaries; no generic CRUD base types are included. Feature concerns stay in their owning modules rather than accumulating in `shared`.
 
-Planned boundaries: application, market, source, analysis, catalogue, retailer, affiliate, feed, compatibility, feedback, storage, jobs, shared. Future APIs use `/api/v1`; no domain endpoint exists now.
+Planned boundaries: application, market, source, analysis, catalogue, retailer, affiliate, feed, compatibility, feedback, storage, jobs, shared. APIs use `/api/v1`; context and retailer read endpoints are documented in the market/retailer foundation.
 
 ## Architecture decisions
 
@@ -16,7 +16,7 @@ Planned boundaries: application, market, source, analysis, catalogue, retailer, 
 
 [ADR-017](../adr/ADR-017-outfit-compatibility-engine.md): The MVP is partner matching, but reusable compatibility/retrieval/ranking architecture must remain person-relationship-neutral so future product modes can reuse it without redesigning the engine.
 
-Neither business modules nor future modes are implemented here. The public score remains Couple Match Score.
+Only market/retailer foundations exist; no matching or future modes are implemented. The public score remains Couple Match Score.
 
 ## API, security and observability
 
@@ -34,4 +34,4 @@ Only Actuator health is exposed. Details/components are hidden. Liveness exclude
 
 Primary workflow: local backend → Docker PostgreSQL/pgvector. A future Next.js frontend may run locally; its directory is reserved only. The backend multi-stage Java 21 image includes only the runtime JAR and runs non-root.
 
-JUnit Jupiter tests use PostgreSQL Testcontainers, test context startup, migration history, extension installation, absent domain tables, safe health exposure, validation, generic errors, correlation and CORS/headers. Docker is required, with no skipped-container fallback. GitHub Actions on PRs and pushes to main sets up Java 21, caches Maven and runs `./mvnw clean verify` on a Docker-capable Ubuntu runner. CI neither deploys nor publishes images.
+JUnit Jupiter tests use PostgreSQL Testcontainers, test context startup, migration history, extension installation, the exact approved schema, safe health exposure, validation, generic errors, correlation and CORS/headers. Docker is required, with no skipped-container fallback. GitHub Actions on PRs and pushes to main sets up Java 21, caches Maven and runs `./mvnw clean verify` on a Docker-capable Ubuntu runner. CI neither deploys nor publishes images.

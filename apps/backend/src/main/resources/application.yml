@@ -42,6 +42,10 @@ management:
         readiness:
           include: readinessState,db
 coupleoutfit:
+  market:
+    default-country-code: ${MARKET_DEFAULT_COUNTRY_CODE:GB}
+    default-currency-code: ${MARKET_DEFAULT_CURRENCY_CODE:GBP}
+    default-locale-code: ${MARKET_DEFAULT_LOCALE_CODE:en-GB}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 logging:

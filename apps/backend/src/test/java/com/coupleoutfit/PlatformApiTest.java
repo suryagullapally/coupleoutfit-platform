@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(properties = "coupleoutfit.cors.allowed-origins=http://localhost:3000",
+@WebMvcTest(controllers = PlatformApiTest.ProbeController.class, properties = "coupleoutfit.cors.allowed-origins=http://localhost:3000",
         excludeAutoConfiguration = org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration.class)
 @Import({PlatformApiTest.ProbeController.class, ApiExceptionHandler.class,
         RequestCorrelationFilter.class, SecurityConfiguration.class})

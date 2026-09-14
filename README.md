@@ -1,6 +1,6 @@
 # CoupleOutfit
 
-The backend platform and Phase 0 frontend foundations are in place. No CoupleOutfit business features are implemented.
+The backend platform and Phase 0 frontend foundations are in place. Prompt 002 adds market and retailer foundations; matching and other product workflows are not implemented.
 
 The canonical Next.js frontend location is `apps/frontend`; see the [frontend README](apps/frontend/README.md) for setup and validation.
 
@@ -66,7 +66,11 @@ Copy `.env.example` to `.env` only if you need to change local defaults. Never c
 
 Expected production CORS configuration is `https://coupleoutfit.com,https://www.coupleoutfit.com`; supply it explicitly. Future OpenAI, R2, and affiliate credentials are not consumed or required.
 
-Flyway migrations live in `apps/backend/src/main/resources/db/migration`. V1 enables pgvector only. Staging/production must provide pgvector binaries and an appropriately privileged migration connection. Flyway failure prevents startup. Hibernate validates and does not evolve schemas.
+Flyway migrations live in `apps/backend/src/main/resources/db/migration`. V1 enables pgvector; V2 creates and seeds the market reference foundation and creates empty retailer tables. Staging/production must provide pgvector binaries and an appropriately privileged migration connection. Flyway failure prevents startup. Hibernate validates and does not evolve schemas.
+
+## Market and retailer foundation
+
+`GET /api/v1/context` returns the configured active market; `GET /api/v1/retailers` initially returns an empty list. Backend launch defaults are centralized in application.yml. Deployment overrides use `MARKET_DEFAULT_COUNTRY_CODE`, `MARKET_DEFAULT_CURRENCY_CODE`, and `MARKET_DEFAULT_LOCALE_CODE`; invalid or inactive reference data fails startup. There is no public market switching. See [market/retailer architecture](docs/architecture/market-retailer-foundation.md).
 
 ## Backend image
 
