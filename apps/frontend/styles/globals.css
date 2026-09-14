@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f7f7f2;
+  --color-surface: #ffffff;
+  --color-ink: #203d32;
+  --color-muted: #59665e;
+  --color-line: #d7dfd6;
+  --color-accent: #dce8cc;
+  --color-focus: #275ec0;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+  --container-content: 76rem;
+  --radius-panel: 1.5rem;
+  --spacing: 0.25rem;
+}
+
+@layer base {
+  body { background: var(--color-canvas); color: var(--color-ink); }
+  :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 5px; }
+  ::selection { background: var(--color-accent); color: var(--color-ink); }
+}

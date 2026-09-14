@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    # Replaced with the real PostgreSQL Testcontainer connection by @ServiceConnection.
+    url: jdbc:postgresql://localhost:1/testcontainer_required
+    username: test
+    password: test

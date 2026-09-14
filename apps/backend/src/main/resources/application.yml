@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: coupleoutfit-backend
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    clean-disabled: true
+  jackson:
+    time-zone: UTC
+  web:
+    error:
+      include-message: never
+      include-binding-errors: never
+      include-stacktrace: never
+      include-exception: false
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: none
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+coupleoutfit:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd'T'HH:mm:ss.SSSXXX,UTC
+    level: '%5p [requestId=%X{requestId:-}]'
