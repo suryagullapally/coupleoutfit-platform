@@ -19,3 +19,5 @@ logs/
 *.swp
 .mvn/wrapper/maven-wrapper.jar
 **/*.tsbuildinfo
+
+**/.local/

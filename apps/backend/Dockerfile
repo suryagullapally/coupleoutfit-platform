@@ -9,6 +9,7 @@ RUN ./mvnw -B -DskipTests package
 FROM eclipse-temurin:21-jre-jammy
 RUN groupadd --system app && useradd --system --gid app --home-dir /app app
 WORKDIR /app
+RUN mkdir -p /app/.local/source-assets && chown -R app:app /app/.local
 COPY --from=build --chown=app:app /workspace/target/backend-0.0.1-SNAPSHOT.jar app.jar
 USER app
 ENV TZ=UTC

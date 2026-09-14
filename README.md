@@ -81,3 +81,26 @@ docker build -t coupleoutfit-backend:local apps/backend
 Supply the active profile, reachable JDBC URL and credentials at runtime. Container `localhost` is not the host database. The image runs as a non-root user. Image packaging skips tests because Docker-based integration tests run separately in CI with `clean verify`.
 
 See [backend architecture](docs/architecture/backend-foundation.md) and [ADRs](docs/adr/README.md). The approved baseline is Java 21 and Spring Boot 4.1.1 (Corrective Prompt 001A).
+
+
+### Local source image upload
+
+With PostgreSQL running, start the backend using the `local` profile. Source files use ignored `apps/backend/.local/source-assets` when launched from `apps/backend`; override with `SOURCE_STORAGE_LOCAL_ROOT`. The Docker image provides writable `/app/.local/source-assets` for its non-root user. Production storage remains disabled until private R2 is configured.
+
+Example using curl and jq, with a small local PNG:
+
+```bash
+curl -sS -c /tmp/coupleoutfit-cookies -H 'X-Source-Request: 1' -H 'Content-Type: application/json' \
+  -d '{"sourceType":"IMAGE_UPLOAD"}' http://localhost:8080/api/v1/source-items > /tmp/coupleoutfit-source.json
+SOURCE_ID=$(jq -r .sourceItemId /tmp/coupleoutfit-source.json)
+ASSET_ID=$(jq -r .upload.assetId /tmp/coupleoutfit-source.json)
+UPLOAD_URL=$(jq -r .upload.uploadUrl /tmp/coupleoutfit-source.json)
+curl -f -X PUT -H 'Content-Type: image/png' --data-binary @your-image.png "http://localhost:8080$UPLOAD_URL"
+curl -sS -b /tmp/coupleoutfit-cookies -H 'X-Source-Request: 1' -H 'Content-Type: application/json' \
+  -d "{\"assetId\":\"$ASSET_ID\"}" "http://localhost:8080/api/v1/source-items/$SOURCE_ID/upload-complete"
+curl -sS -b /tmp/coupleoutfit-cookies "http://localhost:8080/api/v1/source-items/$SOURCE_ID"
+```
+
+Expect READY_FOR_ANALYSIS; no AI call occurs. Upload authorization expires after 15 minutes and permits one write. The local upload/read endpoints do not exist in staging/production. Unsupported product URLs return IMAGE_UPLOAD_REQUIRED; POST the owned source's `/upload-authorization` endpoint to obtain fallback upload details. All source POSTs require `X-Source-Request: 1`.
+
+For browser development, use same-origin routing and configure `SOURCE_PUBLIC_ORIGIN`; CORS credentials remain disabled. Local anonymous cookies use a process-generated signing key unless `SOURCE_SESSION_SIGNING_KEY` is supplied, so a restart normally invalidates prior cookies. Use a stable random development key for persistence across restarts. See [source input architecture](docs/architecture/source-input-foundation.md) for ownership, storage, validation and production prerequisites.

@@ -16,7 +16,7 @@ Planned boundaries: application, market, source, analysis, catalogue, retailer, 
 
 [ADR-017](../adr/ADR-017-outfit-compatibility-engine.md): The MVP is partner matching, but reusable compatibility/retrieval/ranking architecture must remain person-relationship-neutral so future product modes can reuse it without redesigning the engine.
 
-Only market/retailer foundations exist; no matching or future modes are implemented. The public score remains Couple Match Score.
+Market/retailer and [commercial catalogue foundations](commercial-catalogue-foundation.md) exist; no matching or future modes are implemented. The public score remains Couple Match Score.
 
 ## API, security and observability
 

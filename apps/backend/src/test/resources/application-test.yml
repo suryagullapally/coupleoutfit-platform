@@ -4,3 +4,9 @@ spring:
     url: jdbc:postgresql://localhost:1/testcontainer_required
     username: test
     password: test
+
+coupleoutfit:
+  storage:
+    provider: local
+    local:
+      root: ${java.io.tmpdir}/coupleoutfit-test-${random.uuid}

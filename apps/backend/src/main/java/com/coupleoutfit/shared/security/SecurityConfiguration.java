@@ -21,7 +21,8 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http,
             @Qualifier("corsConfigurationSource") CorsConfigurationSource cors) throws Exception {
         return http
-            // No cookie/session authentication exists. Revisit CSRF before adding ambient credentials.
+            // Source cookie writes enforce a same-origin custom-header guard in AnonymousSourceSession.
+            // Other platform endpoints remain stateless; CORS credentials stay disabled.
             .csrf(AbstractHttpConfigurer::disable)
             .cors(config -> config.configurationSource(cors))
             .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
