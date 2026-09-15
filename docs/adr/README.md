@@ -10,4 +10,8 @@ Use `ADR-NNN-short-kebab-case-title.md`, preserving approved identifiers and dec
 - [ADR-019 — Supported URL resolution](ADR-019-supported-url-resolution.md)
 - [ADR-020 — Private source storage](ADR-020-private-source-storage.md)
 
+- [ADR-021 — Immutable analysis revisions](ADR-021-immutable-analysis-revisions.md)
+- [ADR-022 — OpenAI provider boundary](ADR-022-openai-provider-boundary.md)
+- [ADR-023 — Structured clothing schema](ADR-023-structured-clothing-schema.md)
+
 Numbering comes from the approved implementation brief; missing numbers are not placeholder decisions.

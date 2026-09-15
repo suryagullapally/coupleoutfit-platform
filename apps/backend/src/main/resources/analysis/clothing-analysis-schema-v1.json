@@ -1,0 +1,306 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "TOP",
+            "SHIRT",
+            "T_SHIRT",
+            "KNITWEAR",
+            "DRESS",
+            "JUMPSUIT",
+            "TROUSERS",
+            "JEANS",
+            "SKIRT",
+            "SHORTS",
+            "SUIT",
+            "JACKET",
+            "COAT",
+            "FOOTWEAR",
+            "ACCESSORY",
+            "OTHER"
+          ]
+        },
+        "subcategory": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "MIDI_DRESS",
+            "MAXI_DRESS",
+            "MINI_DRESS",
+            "SHIRT",
+            "T_SHIRT",
+            "BLOUSE",
+            "TROUSERS",
+            "JEANS",
+            "SUIT",
+            "JACKET",
+            "COAT",
+            "KNITWEAR",
+            "FOOTWEAR",
+            "SKIRT",
+            "SHORTS",
+            "JUMPSUIT",
+            "OTHER",
+            null
+          ]
+        },
+        "primaryColors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BLACK",
+              "WHITE",
+              "GREY",
+              "NAVY",
+              "BLUE",
+              "LIGHT_BLUE",
+              "RED",
+              "BURGUNDY",
+              "PINK",
+              "PURPLE",
+              "GREEN",
+              "OLIVE",
+              "YELLOW",
+              "ORANGE",
+              "BROWN",
+              "BEIGE",
+              "CREAM",
+              "GOLD",
+              "SILVER",
+              "MULTICOLOUR",
+              "UNKNOWN"
+            ]
+          },
+          "maxItems": 3
+        },
+        "secondaryColors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "BLACK",
+              "WHITE",
+              "GREY",
+              "NAVY",
+              "BLUE",
+              "LIGHT_BLUE",
+              "RED",
+              "BURGUNDY",
+              "PINK",
+              "PURPLE",
+              "GREEN",
+              "OLIVE",
+              "YELLOW",
+              "ORANGE",
+              "BROWN",
+              "BEIGE",
+              "CREAM",
+              "GOLD",
+              "SILVER",
+              "MULTICOLOUR",
+              "UNKNOWN"
+            ]
+          },
+          "maxItems": 3
+        },
+        "materialAppearance": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "DENIM",
+              "SATIN_LIKE",
+              "LEATHER_LIKE",
+              "KNIT",
+              "COTTON_LIKE",
+              "LINEN_LIKE",
+              "WOOL_LIKE",
+              "SHEER",
+              "VELVET_LIKE",
+              "SEQUINED",
+              "SYNTHETIC_LIKE",
+              "UNKNOWN"
+            ]
+          },
+          "maxItems": 4
+        },
+        "seasonality": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SPRING",
+              "SUMMER",
+              "AUTUMN",
+              "WINTER"
+            ]
+          },
+          "maxItems": 4
+        },
+        "styleTags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "CLASSIC",
+              "MINIMAL",
+              "ELEGANT",
+              "EVENING",
+              "SPORTY",
+              "STREETWEAR",
+              "BOHEMIAN",
+              "ROMANTIC",
+              "EDGY",
+              "PREPPY",
+              "TAILORED",
+              "RELAXED",
+              "VINTAGE",
+              "CONTEMPORARY",
+              "UTILITY",
+              "FESTIVE",
+              "UNKNOWN"
+            ]
+          },
+          "maxItems": 8
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "MIDI",
+              "MAXI",
+              "MINI",
+              "SLEEVELESS",
+              "SHORT_SLEEVE",
+              "LONG_SLEEVE",
+              "COLLARED",
+              "V_NECK",
+              "CREW_NECK",
+              "HIGH_NECK",
+              "BUTTONED",
+              "ZIPPER",
+              "PLEATED",
+              "RUFFLED",
+              "LACE",
+              "EMBROIDERED",
+              "BELTED",
+              "LAYERED",
+              "MULTI_GARMENT",
+              "POCKETS",
+              "HOODED",
+              "CROPPED",
+              "WIDE_LEG",
+              "STRAIGHT_LEG",
+              "TAPERED",
+              "UNKNOWN"
+            ]
+          },
+          "maxItems": 10
+        },
+        "pattern": {
+          "type": "string",
+          "enum": [
+            "SOLID",
+            "STRIPED",
+            "CHECKED",
+            "FLORAL",
+            "POLKA_DOT",
+            "ANIMAL",
+            "PRINTED",
+            "TEXTURED",
+            "COLOUR_BLOCK",
+            "UNKNOWN"
+          ]
+        },
+        "fit": {
+          "type": "string",
+          "enum": [
+            "SLIM",
+            "REGULAR",
+            "RELAXED",
+            "OVERSIZED",
+            "FITTED",
+            "STRUCTURED",
+            "FLOWING",
+            "UNKNOWN"
+          ]
+        },
+        "formality": {
+          "type": "string",
+          "enum": [
+            "CASUAL",
+            "SMART_CASUAL",
+            "SMART",
+            "FORMAL",
+            "EVENING",
+            "SPORTY",
+            "UNKNOWN"
+          ]
+        }
+      },
+      "required": [
+        "category",
+        "subcategory",
+        "primaryColors",
+        "secondaryColors",
+        "materialAppearance",
+        "seasonality",
+        "styleTags",
+        "details",
+        "pattern",
+        "fit",
+        "formality"
+      ]
+    },
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "primaryColors": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "materialAppearance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "category",
+        "primaryColors",
+        "materialAppearance"
+      ]
+    }
+  },
+  "required": [
+    "attributes",
+    "confidence"
+  ]
+}

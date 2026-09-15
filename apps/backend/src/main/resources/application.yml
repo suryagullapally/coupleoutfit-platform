@@ -42,6 +42,17 @@ management:
         readiness:
           include: readinessState,db
 coupleoutfit:
+  ai:
+    clothing-analysis:
+      provider: ${CLOTHING_ANALYSIS_PROVIDER:disabled}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_CLOTHING_ANALYSIS_MODEL:}
+      connect-timeout: PT5S
+      request-timeout: PT20S
+      max-attempts: 2
+      retry-backoff: PT0.25S
+      image-detail: low
+      max-output-tokens: 2048
   storage:
     provider: ${SOURCE_STORAGE_PROVIDER:disabled}
     local:

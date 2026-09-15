@@ -64,7 +64,7 @@ Copy `.env.example` to `.env` only if you need to change local defaults. Never c
 | `PORT` | Backend port, default 8080 |
 | `POSTGRES_PORT` | Compose host port, default 5432 |
 
-Expected production CORS configuration is `https://coupleoutfit.com,https://www.coupleoutfit.com`; supply it explicitly. Future OpenAI, R2, and affiliate credentials are not consumed or required.
+Expected production CORS configuration is `https://coupleoutfit.com,https://www.coupleoutfit.com`; supply it explicitly. OpenAI credentials are optional for explicitly enabled clothing analysis. R2 and affiliate credentials are not consumed or required.
 
 Flyway migrations live in `apps/backend/src/main/resources/db/migration`. V1 enables pgvector; V2 creates and seeds the market reference foundation and creates empty retailer tables. Staging/production must provide pgvector binaries and an appropriately privileged migration connection. Flyway failure prevents startup. Hibernate validates and does not evolve schemas.
 
@@ -104,3 +104,19 @@ curl -sS -b /tmp/coupleoutfit-cookies "http://localhost:8080/api/v1/source-items
 Expect READY_FOR_ANALYSIS; no AI call occurs. Upload authorization expires after 15 minutes and permits one write. The local upload/read endpoints do not exist in staging/production. Unsupported product URLs return IMAGE_UPLOAD_REQUIRED; POST the owned source's `/upload-authorization` endpoint to obtain fallback upload details. All source POSTs require `X-Source-Request: 1`.
 
 For browser development, use same-origin routing and configure `SOURCE_PUBLIC_ORIGIN`; CORS credentials remain disabled. Local anonymous cookies use a process-generated signing key unless `SOURCE_SESSION_SIGNING_KEY` is supplied, so a restart normally invalidates prior cookies. Use a stable random development key for persistence across restarts. See [source input architecture](docs/architecture/source-input-foundation.md) for ownership, storage, validation and production prerequisites.
+
+
+### Clothing analysis (Prompt 005)
+
+Normal tests use mocked OpenAI responses and a test-only provider; `clean verify` does not call live OpenAI or require an API key. By default analysis is disabled, while the application and existing APIs remain healthy.
+
+For an optional live smoke test, set `CLOTHING_ANALYSIS_PROVIDER=openai`, supply `OPENAI_API_KEY` through your local secret environment, and set `OPENAI_CLOTHING_ANALYSIS_MODEL` to a vision-capable Responses model supporting structured output. No model is selected by default. Never put credentials in source files or shell command arguments. Start the local backend and complete the source-upload workflow above with an image you intend to send to OpenAI, then:
+
+```bash
+curl -sS -b /tmp/coupleoutfit-cookies -H 'X-Source-Request: 1' -X POST \
+  "http://localhost:8080/api/v1/source-items/$SOURCE_ID/analysis"
+curl -sS -b /tmp/coupleoutfit-cookies \
+  "http://localhost:8080/api/v1/source-items/$SOURCE_ID/analysis"
+```
+
+A successful response contains `COMPLETED` and AI revision 1. Repeating POST returns the existing result without another provider call. Without provider configuration it fails safely with `ANALYSIS_PROVIDER_UNAVAILABLE`. A correction POST to `/analysis/revisions` accepts `parentRevisionId` plus the full returned `attributes` object; stale parents return 409. See [clothing analysis architecture](docs/architecture/clothing-analysis-foundation.md) for schema, retry limits, privacy, pending production R2 integration and recovery limitations.
