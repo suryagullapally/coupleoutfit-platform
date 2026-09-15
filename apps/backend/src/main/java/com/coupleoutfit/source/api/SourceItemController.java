@@ -58,7 +58,7 @@ public class SourceItemController {
         if(body.assetId()==null) throw new SourceException("SOURCE_REQUEST_INVALID");
         return result(complete.complete(id,body.assetId(),session.require(request)),null,HttpStatus.OK);
     }
-    @GetMapping("/{id}") public ResponseEntity<Response> get(@PathVariable UUID id,HttpServletRequest request) {
-        return result(repository.findOwned(id,session.require(request)),null,HttpStatus.OK);
+    @GetMapping("/{id}") public ResponseEntity<Response> get(@PathVariable UUID id,HttpServletRequest request,HttpServletResponse response) {
+        return result(repository.findOwned(id,session.require(request,response)),null,HttpStatus.OK);
     }
 }

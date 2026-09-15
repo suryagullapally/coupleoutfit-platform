@@ -1,7 +1,6 @@
 package com.coupleoutfit.source.infrastructure;
 
 import com.coupleoutfit.source.domain.*;
-import com.coupleoutfit.market.domain.MarketContext;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;

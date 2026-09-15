@@ -7,7 +7,6 @@ import com.coupleoutfit.catalogue.domain.*;
 import com.coupleoutfit.analysis.application.*;
 import com.coupleoutfit.analysis.domain.*;
 import com.coupleoutfit.analysis.AnalysisFixtures;
-import com.coupleoutfit.market.domain.MarketContext;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +72,8 @@ class CompatibilityIntegrationTest {
         var source=source();var near=fixture("NAVY");var far=fixture("RED");var best=fixture("BLUE");
         var unknown=fixture("NAVY");var otherMarket=fixture("BLUE",ProductTarget.MENSWEAR,ProductCategory.SHIRT,"IN");
         var otherTarget=fixture("BLUE",ProductTarget.WOMENSWEAR,ProductCategory.DRESS,"GB");var accessory=fixture("BLUE",ProductTarget.MENSWEAR,ProductCategory.ACCESSORY,"GB");
-        var missing=fixture("BLUE");var stale=fixture("BLUE");var inactive=fixture("BLUE");var catalogueDisabled=fixture("BLUE");var matchingDisabled=fixture("BLUE");var out=fixture("BLUE");var noPrice=fixture("NAVY");var inactiveProduct=fixture("BLUE");var inactiveOffer=fixture("BLUE");var inactiveRetailer=fixture("BLUE");
+        fixture("BLUE"); // An offer without a prepared embedding must be excluded.
+        var stale=fixture("BLUE");var inactive=fixture("BLUE");var catalogueDisabled=fixture("BLUE");var matchingDisabled=fixture("BLUE");var out=fixture("BLUE");var noPrice=fixture("NAVY");var inactiveProduct=fixture("BLUE");var inactiveOffer=fixture("BLUE");var inactiveRetailer=fixture("BLUE");
         products.prepareBatch(List.of(near,far,best,unknown,otherMarket,otherTarget,accessory,stale,inactive,catalogueDisabled,matchingDisabled,out,noPrice,inactiveProduct,inactiveOffer,inactiveRetailer).stream().map(f->f.product().id()).toList());
         jdbc.update("UPDATE product_offer SET availability_status='UNKNOWN' WHERE id=?",unknown.offer());
         jdbc.update("UPDATE retailer_market SET status='INACTIVE' WHERE id=?",inactive.market());
@@ -184,7 +184,7 @@ class CompatibilityIntegrationTest {
         assertThatThrownBy(()->jdbc.update("UPDATE analysis_embedding SET analysis_revision_id=? WHERE analysis_revision_id=?",UUID.randomUUID(),revision.id())).isInstanceOf(org.springframework.dao.DataAccessException.class);
     }
     @Test void migrationColumnsKeysAndUpgradeOverV5PreserveChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7");
         assertThat(jdbc.queryForObject("SELECT format_type(atttypid,atttypmod) FROM pg_attribute WHERE attrelid='product_embedding'::regclass AND attname='embedding'",String.class)).isEqualTo("vector(1536)");
         var f=fixture("BLUE");products.ensure(f.product().id());
         assertThatThrownBy(()->jdbc.update("INSERT INTO product_embedding SELECT gen_random_uuid(),product_id,embedding_type,provider,model,dimensions,descriptor_version,source_version,descriptor_hash,source_updated_at,embedding,provider_request_id,created_at,updated_at,completed_at FROM product_embedding")).isInstanceOf(org.springframework.dao.DataAccessException.class);

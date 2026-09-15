@@ -55,13 +55,13 @@ class SourceIntegrationTest {
     }
     private Created image() throws Exception { return create("{\"sourceType\":\"IMAGE_UPLOAD\"}"); }
     private void upload(Created c,String format) throws Exception {
-        mvc.perform(put(c.data.path("upload").path("uploadUrl").asText()).contentType("image/"+format).content(SourceStorageTest.fixture(format)))
+        mvc.perform(put(c.data.path("upload").path("uploadUrl").asString()).contentType("image/"+format).content(SourceStorageTest.fixture(format)))
                 .andExpect(status().isNoContent());
     }
     private org.springframework.test.web.servlet.ResultActions complete(Created c) throws Exception {
-        return mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asText()+"/upload-complete")
+        return mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asString()+"/upload-complete")
                 .cookie(c.cookie).header("X-Source-Request","1").contentType("application/json")
-                .content("{\"assetId\":\""+c.data.path("asset").path("assetId").asText()+"\"}"));
+                .content("{\"assetId\":\""+c.data.path("asset").path("assetId").asString()+"\"}"));
     }
     @AfterEach void cleanup() {
         jdbc.queryForList("SELECT storage_key FROM source_asset",String.class).forEach(storage::deleteObject);
@@ -71,30 +71,30 @@ class SourceIntegrationTest {
     }
     @Test void imageLifecycleAndRepeatedCompletionPreservePrivateState() throws Exception {
         for(String format:List.of("png","jpeg","webp")) {
-            var c=image(); assertThat(c.data.path("status").asText()).isEqualTo("AWAITING_UPLOAD");
+            var c=image(); assertThat(c.data.path("status").asString()).isEqualTo("AWAITING_UPLOAD");
             upload(c,format);
             complete(c).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("READY_FOR_ANALYSIS"))
                     .andExpect(jsonPath("$.asset.status").value("VERIFIED")).andExpect(jsonPath("$.asset.width").value(2))
                     .andExpect(jsonPath("$.asset.height").value(3)).andExpect(jsonPath("$.market.currencyCode").value("GBP"));
             complete(c).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("READY_FOR_ANALYSIS"));
-            mvc.perform(get("/api/v1/source-items/"+c.data.path("sourceItemId").asText()).cookie(c.cookie))
+            mvc.perform(get("/api/v1/source-items/"+c.data.path("sourceItemId").asString()).cookie(c.cookie))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.asset.mediaType").value("image/"+format))
                     .andExpect(jsonPath("$.asset.storageKey").doesNotExist()).andExpect(jsonPath("$.asset.sha256").doesNotExist());
         }
         assertThat(jdbc.queryForObject("SELECT count(*) FROM source_asset WHERE status='VERIFIED' AND sha256 IS NOT NULL",Integer.class)).isEqualTo(3);
     }
     @Test void anotherSessionCannotReadCompleteOrAuthorizeOwnedSource() throws Exception {
-        var first=image(); var other=image(); String id=first.data.path("sourceItemId").asText();
+        var first=image(); var other=image(); String id=first.data.path("sourceItemId").asString();
         for(Cookie cookie:List.of(other.cookie,new Cookie(AnonymousSourceSession.COOKIE,"forged"))) {
             mvc.perform(get("/api/v1/source-items/"+id).cookie(cookie)).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SOURCE_NOT_FOUND"));
             mvc.perform(post("/api/v1/source-items/"+id+"/upload-complete").cookie(cookie).header("X-Source-Request","1")
-                    .contentType("application/json").content("{\"assetId\":\""+first.data.path("asset").path("assetId").asText()+"\"}"))
+                    .contentType("application/json").content("{\"assetId\":\""+first.data.path("asset").path("assetId").asString()+"\"}"))
                     .andExpect(status().isNotFound());
             mvc.perform(post("/api/v1/source-items/"+id+"/upload-authorization").cookie(cookie).header("X-Source-Request","1")).andExpect(status().isNotFound());
         }
         mvc.perform(get("/api/v1/source-items/"+id)).andExpect(status().isNotFound());
         mvc.perform(post("/api/v1/source-items/"+id+"/upload-complete").cookie(first.cookie).header("X-Source-Request","1")
-                .contentType("application/json").content("{\"assetId\":\""+other.data.path("asset").path("assetId").asText()+"\"}"))
+                .contentType("application/json").content("{\"assetId\":\""+other.data.path("asset").path("assetId").asString()+"\"}"))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SOURCE_ASSET_NOT_FOUND"));
     }
     @Test void sourceWritesRequireExplicitSameOriginIntentAndTypeSpecificFields() throws Exception {
@@ -115,9 +115,9 @@ class SourceIntegrationTest {
                     .andExpect(jsonPath("$.code").value("SOURCE_URL_INVALID")).andExpect(jsonPath("$.traceId").value("url-invalid"));
         }
         var c=create("{\"sourceType\":\"PRODUCT_URL\",\"url\":\"https://unknown.example.com/p?private=value\"}");
-        assertThat(c.data.path("status").asText()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
-        assertThat(c.data.path("action").asText()).isEqualTo("UPLOAD_IMAGE");
-        var fallback=mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asText()+"/upload-authorization")
+        assertThat(c.data.path("status").asString()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
+        assertThat(c.data.path("action").asString()).isEqualTo("UPLOAD_IMAGE");
+        var fallback=mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asString()+"/upload-authorization")
                 .cookie(c.cookie).header("X-Source-Request","1")).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("AWAITING_UPLOAD"))
                 .andReturn().getResponse();
         var pending=new Created(json.readTree(fallback.getContentAsString()),c.cookie);
@@ -136,8 +136,8 @@ class SourceIntegrationTest {
     @Test void knownOfferResolvesWithoutCopyingProductOrFetchingRemoteImages() throws Exception {
         var offer=catalogueFixture(true);
         var c=create("{\"sourceType\":\"PRODUCT_URL\",\"url\":\"HTTPS://Shop.Example.com:443/p?id=1#image\"}");
-        assertThat(c.data.path("status").asText()).isEqualTo("READY_FOR_ANALYSIS");
-        assertThat(c.data.path("urlResolution").path("productOfferId").asText()).isEqualTo(offer.toString());
+        assertThat(c.data.path("status").asString()).isEqualTo("READY_FOR_ANALYSIS");
+        assertThat(c.data.path("urlResolution").path("productOfferId").asString()).isEqualTo(offer.toString());
         assertThat(c.data.toString()).doesNotContain("secret.example.com","affiliateUrl","resolvedImageUrl");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM product",Integer.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM source_asset",Integer.class)).isZero();
@@ -147,33 +147,33 @@ class SourceIntegrationTest {
     @Test void knownRetailerWithoutUsableOfferAndInactiveOffersFallBack() throws Exception {
         var offer=catalogueFixture(false);
         var missing=create("{\"sourceType\":\"PRODUCT_URL\",\"url\":\"https://shop.example.com/p?id=1\"}");
-        assertThat(missing.data.path("status").asText()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
-        assertThat(missing.data.path("urlResolution").path("reason").asText()).isEqualTo("SUPPORTED_RETAILER_URL_NOT_RESOLVABLE");
+        assertThat(missing.data.path("status").asString()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
+        assertThat(missing.data.path("urlResolution").path("reason").asString()).isEqualTo("SUPPORTED_RETAILER_URL_NOT_RESOLVABLE");
         jdbc.update("UPDATE product_offer SET primary_image_url='https://shop.example.com/i.png',active=false WHERE id=?",offer);
         var inactive=create("{\"sourceType\":\"PRODUCT_URL\",\"url\":\"https://shop.example.com/p?id=1\"}");
-        assertThat(inactive.data.path("status").asText()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
+        assertThat(inactive.data.path("status").asString()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
         var unknown=create("{\"sourceType\":\"PRODUCT_URL\",\"url\":\"https://shop.example.com/unknown\"}");
-        assertThat(unknown.data.path("status").asText()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
+        assertThat(unknown.data.path("status").asString()).isEqualTo("IMAGE_UPLOAD_REQUIRED");
     }
     @Test void rejectedUploadPersistsFailureAndDeletesUnsafeBytes() throws Exception {
         var c=image();
-        mvc.perform(put(c.data.path("upload").path("uploadUrl").asText()).contentType("image/png").content("<html>fake</html>"))
+        mvc.perform(put(c.data.path("upload").path("uploadUrl").asString()).contentType("image/png").content("<html>fake</html>"))
                 .andExpect(status().isNoContent());
         complete(c).andExpect(status().isUnsupportedMediaType()).andExpect(jsonPath("$.code").value("SOURCE_IMAGE_TYPE_UNSUPPORTED"));
-        mvc.perform(get("/api/v1/source-items/"+c.data.path("sourceItemId").asText()).cookie(c.cookie))
+        mvc.perform(get("/api/v1/source-items/"+c.data.path("sourceItemId").asString()).cookie(c.cookie))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("FAILED")).andExpect(jsonPath("$.asset.status").value("REJECTED"));
         String key=jdbc.queryForObject("SELECT storage_key FROM source_asset",String.class);
         assertThatThrownBy(() -> storage.headObject(key)).isInstanceOf(SourceException.class);
     }
     @Test void missingUploadIsSafeAndAuthorizationCanBeRenewedWithoutDuplicateAssets() throws Exception {
         var c=image();
-        mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asText()+"/upload-authorization").cookie(c.cookie).header("X-Source-Request","1"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.asset.assetId").value(c.data.path("asset").path("assetId").asText()));
+        mvc.perform(post("/api/v1/source-items/"+c.data.path("sourceItemId").asString()+"/upload-authorization").cookie(c.cookie).header("X-Source-Request","1"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.asset.assetId").value(c.data.path("asset").path("assetId").asString()));
         assertThat(jdbc.queryForObject("SELECT count(*) FROM source_asset",Integer.class)).isEqualTo(1);
         complete(c).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SOURCE_UPLOAD_NOT_FOUND"));
     }
     @Test void concurrentCompletionCannotDuplicateOrCorruptState() throws Exception {
-        var c=image(); upload(c,"png"); UUID id=UUID.fromString(c.data.path("sourceItemId").asText()),asset=UUID.fromString(c.data.path("asset").path("assetId").asText());
+        var c=image(); upload(c,"png"); UUID id=UUID.fromString(c.data.path("sourceItemId").asString()),asset=UUID.fromString(c.data.path("asset").path("assetId").asString());
         String owner=jdbc.queryForObject("SELECT owner_session_id FROM source_item WHERE id=?",String.class,id);
         try(var executor=Executors.newFixedThreadPool(2)) {
             var gate=new CountDownLatch(1);
@@ -187,7 +187,7 @@ class SourceIntegrationTest {
     }
     @Test void transientVerificationFailureCanRetryAndInterruptedLeaseRecovers() throws Exception {
         var c=image(); upload(c,"png");
-        UUID id=UUID.fromString(c.data.path("sourceItemId").asText()),asset=UUID.fromString(c.data.path("asset").path("assetId").asText());
+        UUID id=UUID.fromString(c.data.path("sourceItemId").asString()),asset=UUID.fromString(c.data.path("asset").path("assetId").asString());
         String owner=jdbc.queryForObject("SELECT owner_session_id FROM source_item WHERE id=?",String.class,id);
         var transientFailure=new CompleteSourceUpload(repository,(a,now) -> {throw new SourceException("SOURCE_STORAGE_UNAVAILABLE");},storage,java.time.Clock.systemUTC());
         assertThatThrownBy(() -> transientFailure.complete(id,asset,owner)).hasMessage("SOURCE_STORAGE_UNAVAILABLE");
@@ -199,7 +199,7 @@ class SourceIntegrationTest {
     }
     @Test void expiredVerifierCannotOverwriteNewClaim() throws Exception {
         var c=image(); upload(c,"png");
-        UUID id=UUID.fromString(c.data.path("sourceItemId").asText()),asset=UUID.fromString(c.data.path("asset").path("assetId").asText());
+        UUID id=UUID.fromString(c.data.path("sourceItemId").asString()),asset=UUID.fromString(c.data.path("asset").path("assetId").asString());
         String owner=jdbc.queryForObject("SELECT owner_session_id FROM source_item WHERE id=?",String.class,id);
         var old=repository.beginVerification(id,asset,owner,Instant.now());
         jdbc.update("UPDATE source_item SET created_at=now()-interval '10 minutes',updated_at=now()-interval '3 minutes' WHERE id=?",id);
@@ -212,12 +212,12 @@ class SourceIntegrationTest {
     }
     @Test void persistedMarketIsAuthoritativeAndHistorical() throws Exception {
         var c=create("{\"sourceType\":\"IMAGE_UPLOAD\",\"countryCode\":\"US\",\"currencyCode\":\"USD\"}");
-        assertThat(c.data.path("market").path("countryCode").asText()).isEqualTo("GB");
+        assertThat(c.data.path("market").path("countryCode").asString()).isEqualTo("GB");
         assertThat(jdbc.queryForObject("SELECT country_code FROM source_item",String.class)).isEqualTo("GB");
         assertThat(jdbc.queryForObject("SELECT currency_code FROM source_item",String.class)).isEqualTo("GBP");
     }
     @Test void cleanAndExistingV3MigrationsPreserveAllPriorChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("source_upgrade").schemas("source_upgrade");
         config.target("3").load().migrate();
         var checksums=jdbc.queryForList("SELECT checksum FROM source_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);
@@ -227,7 +227,7 @@ class SourceIntegrationTest {
         assertThat(jdbc.queryForList("SELECT tablename FROM pg_tables WHERE schemaname='source_upgrade'",String.class)).contains("source_item","source_asset","source_url");
     }
     @Test void foreignKeysCardinalityAndMeasurementConstraintsHold() throws Exception {
-        var c=image(); String id=c.data.path("sourceItemId").asText(),asset=c.data.path("asset").path("assetId").asText();
+        var c=image(); String id=c.data.path("sourceItemId").asString(),asset=c.data.path("asset").path("assetId").asString();
         try(var connection=Objects.requireNonNull(jdbc.getDataSource()).getConnection();var sql=connection.createStatement()) {
             connection.setAutoCommit(false);
             for(String invalid:List.of(

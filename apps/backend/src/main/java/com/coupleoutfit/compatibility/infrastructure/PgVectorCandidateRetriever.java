@@ -30,6 +30,7 @@ public class PgVectorCandidateRetriever implements CandidateRetrievalPort {
             WHERE pe.embedding IS NOT NULL AND pe.embedding_type='STYLE_COMPATIBILITY'
                 AND pe.provider=:provider AND pe.model=:model AND pe.dimensions=:dimensions AND pe.descriptor_version=:descriptorVersion
                 AND rm.country_code=:country AND rm.default_currency_code=:currency AND rm.locale_code=:locale
+                AND (CAST(:retailerRestriction AS uuid) IS NULL OR rm.id=CAST(:retailerRestriction AS uuid))
                 AND c.active AND cu.active AND l.active AND r.status='ACTIVE'
                 AND rm.status='ACTIVE' AND rm.catalogue_enabled AND rm.matching_enabled
                 AND p.status='ACTIVE' AND p.target=:target AND p.category IN (:categories)
@@ -46,7 +47,7 @@ public class PgVectorCandidateRetriever implements CandidateRetrievalPort {
             var p=new MapSqlParameterSource().addValue("vector",VectorStorage.encode(data.vector())).addValue("provider",data.model().provider()).addValue("model",data.model().model())
                     .addValue("dimensions",data.model().dimensions()).addValue("descriptorVersion",data.descriptorVersion()).addValue("country",market.countryCode())
                     .addValue("currency",market.currencyCode()).addValue("locale",market.localeCode()).addValue("target",request.target().name())
-                    .addValue("categories",categories.allowedFor(request.sourceCategory()).stream().map(Enum::name).toList()).addValue("limit",request.candidateLimit());
+                    .addValue("categories",categories.allowedFor(request.sourceCategory()).stream().map(Enum::name).toList()).addValue("limit",request.candidateLimit()).addValue("retailerRestriction",request.retailerMarketRestriction());
             var result=jdbc.query(SQL,p,(rs,n)->{
                 double similarity=Math.clamp(1-rs.getDouble("distance"),0,1);
                 var category=ProductCategory.valueOf(rs.getString("category"));var attributes=new ProductAttributes(json.readValue(rs.getString("attributes"),new tools.jackson.core.type.TypeReference<Map<String,List<String>>>(){}));

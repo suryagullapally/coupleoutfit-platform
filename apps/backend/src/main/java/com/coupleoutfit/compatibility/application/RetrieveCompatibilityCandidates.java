@@ -22,4 +22,10 @@ public final class RetrieveCompatibilityCandidates {
         if(!analyses.findBySource(sourceId).orElseThrow().analysis().currentRevisionId().equals(revision.id())) throw new EmbeddingException("INVALID_COMPATIBILITY_REQUEST");
         return candidates.retrieve(request,embedding,revision.attributes());
     }
+    /** Internal boundary for an already authorized, immutable match-session revision. */
+    public List<CompatibilityCandidate> retrieveSnapshot(CompatibilityRequest request,com.coupleoutfit.analysis.domain.AnalysisRevision revision) {
+        if(!request.analysisRevisionId().equals(revision.id()) || request.sourceCategory()!=revision.attributes().category())
+            throw new EmbeddingException("INVALID_COMPATIBILITY_REQUEST");
+        return candidates.retrieve(request,embeddings.ensure(revision),revision.attributes());
+    }
 }

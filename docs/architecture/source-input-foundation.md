@@ -40,7 +40,7 @@ The JDK supplies JPEG/PNG decoding; the pinned TwelveMonkeys `imageio-webp` 3.13
 
 ## Anonymous ownership and browser security
 
-The server generates a random 256-bit nonce, expiry and HMAC-SHA256 signature in an HttpOnly, SameSite=Strict cookie scoped to `/api/v1/source-items`. Production/staging enforce Secure and require a stable `SOURCE_SESSION_SIGNING_KEY` of at least 32 characters; provision cryptographically random secret material outside Git. Database ownership is only SHA-256 of the signed token. There is no personal information or session table. Missing, forged, expired or non-owning cookies receive the same 404. Cookie values are never included in JSON or logs.
+The server generates a random 256-bit nonce, expiry and HMAC-SHA256 signature in an HttpOnly, SameSite=Strict cookie scoped to `/api/v1` (broadened in Prompt 007 for shared match ownership; owned source GET preserves the token and expires the previous `/api/v1/source-items` cookie). Production/staging enforce Secure and require a stable `SOURCE_SESSION_SIGNING_KEY` of at least 32 characters; provision cryptographically random secret material outside Git. Database ownership is only SHA-256 of the signed token. There is no personal information or session table. Missing, forged, expired or non-owning cookies receive the same 404. Cookie values are never included in JSON or logs.
 
 Default cookie lifetime is seven days. Local/test can use a process-generated signing key; restarting then loses access to prior sessions. Set a stable development key through the environment if persistence across restarts is needed. Production instances must share the configured signing key.
 

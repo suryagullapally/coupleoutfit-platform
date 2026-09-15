@@ -1,6 +1,5 @@
 package com.coupleoutfit.analysis.infrastructure;
 
-import com.coupleoutfit.analysis.application.*;
 import com.coupleoutfit.source.application.*;
 import com.coupleoutfit.source.domain.*;
 import com.coupleoutfit.market.domain.MarketContext;

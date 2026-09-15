@@ -71,10 +71,20 @@ public final class AnonymousSourceSession {
             byte[] random=new byte[32]; new SecureRandom().nextBytes(random);
             String payload=Base64.getUrlEncoder().withoutPadding().encodeToString(random)+"."+clock.instant().plus(lifetime).getEpochSecond();
             token=payload+"."+Base64.getUrlEncoder().withoutPadding().encodeToString(sign(payload));
-            response.addHeader("Set-Cookie",ResponseCookie.from(COOKIE,token).httpOnly(true).secure(secure).sameSite("Strict")
-                    .path("/api/v1/source-items").maxAge(lifetime).build().toString());
         }
+        widenCookie(token,response);
         return owner(token);
+    }
+    // Keep the signed token (and therefore source ownership) when upgrading the old narrow cookie path.
+    private void widenCookie(String token,HttpServletResponse response) {
+        long seconds=Long.parseLong(token.split("[.]")[1])-clock.instant().getEpochSecond();
+        response.addHeader("Set-Cookie",ResponseCookie.from(COOKIE,token).httpOnly(true).secure(secure).sameSite("Strict")
+                .path("/api/v1").maxAge(Duration.ofSeconds(seconds)).build().toString());
+        response.addHeader("Set-Cookie",ResponseCookie.from(COOKIE,"").httpOnly(true).secure(secure).sameSite("Strict")
+                .path("/api/v1/source-items").maxAge(Duration.ZERO).build().toString());
+    }
+    public String require(HttpServletRequest request,HttpServletResponse response) {
+        String owner=require(request);widenCookie(token(request),response);return owner;
     }
     public String require(HttpServletRequest request) {
         String token=token(request);

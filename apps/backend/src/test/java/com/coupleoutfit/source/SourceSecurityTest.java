@@ -19,7 +19,8 @@ class SourceSecurityTest {
         var session=new AnonymousSourceSession(environment,Clock.fixed(now,ZoneOffset.UTC),"a-long-test-signing-key-with-32-bytes",Duration.ofDays(7),"https://coupleoutfit.com");
         var request=new MockHttpServletRequest(); var response=new MockHttpServletResponse();
         String owner=session.createOrRead(request,response); String cookie=response.getHeader("Set-Cookie");
-        assertThat(cookie).contains("HttpOnly","Secure","SameSite=Strict","Path=/api/v1/source-items");
+        assertThat(cookie).contains("HttpOnly","Secure","SameSite=Strict","Path=/api/v1;");
+        assertThat(response.getHeaders("Set-Cookie")).anySatisfy(value -> assertThat(value).contains("Path=/api/v1/source-items", "Max-Age=0", "Secure", "HttpOnly", "SameSite=Strict"));
         String token=cookie.split(";",2)[0].split("=",2)[1];
         assertThat(token).doesNotContain(owner);
         request.setCookies(new Cookie(AnonymousSourceSession.COOKIE,token)); assertThat(session.require(request)).isEqualTo(owner);

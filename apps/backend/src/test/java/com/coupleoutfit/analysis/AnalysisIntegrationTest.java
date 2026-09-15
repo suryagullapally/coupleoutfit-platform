@@ -46,13 +46,13 @@ class AnalysisIntegrationTest {
                 .content("{\"sourceType\":\"IMAGE_UPLOAD\"}")).andExpect(status().isCreated()).andReturn().getResponse();
         var data=json.readTree(response.getContentAsString());
         String token=response.getHeader("Set-Cookie").split(";",2)[0].substring((AnonymousSourceSession.COOKIE+"=").length());
-        var result=new Source(UUID.fromString(data.path("sourceItemId").asText()),new Cookie(AnonymousSourceSession.COOKIE,token));
+        var result=new Source(UUID.fromString(data.path("sourceItemId").asString()),new Cookie(AnonymousSourceSession.COOKIE,token));
         if(ready) {
             try(var fixture=getClass().getResourceAsStream("/images/tiny.png")) {
-                mvc.perform(put(data.path("upload").path("uploadUrl").asText()).contentType("image/png").content(Objects.requireNonNull(fixture).readAllBytes())).andExpect(status().isNoContent());
+                mvc.perform(put(data.path("upload").path("uploadUrl").asString()).contentType("image/png").content(Objects.requireNonNull(fixture).readAllBytes())).andExpect(status().isNoContent());
             }
             mvc.perform(post("/api/v1/source-items/"+result.id()+"/upload-complete").cookie(result.cookie()).header("X-Source-Request","1")
-                    .contentType("application/json").content("{\"assetId\":\""+data.path("asset").path("assetId").asText()+"\"}"))
+                    .contentType("application/json").content("{\"assetId\":\""+data.path("asset").path("assetId").asString()+"\"}"))
                     .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("READY_FOR_ANALYSIS"));
         }
         return result;
@@ -75,7 +75,7 @@ class AnalysisIntegrationTest {
                 .andExpect(header().string("X-Request-Id","analysis-test")).andExpect(header().string("X-Content-Type-Options","nosniff"))
                 .andExpect(header().string("Cache-Control","no-store")).andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContain("provider","promptVersion","model","imageUrl","base64","storageKey","ownerSessionId","raw");
-        String parent=json.readTree(response).path("currentRevision").path("id").asText();
+        String parent=json.readTree(response).path("currentRevision").path("id").asString();
         start(s).andExpect(status().isOk()).andExpect(jsonPath("$.currentRevision.id").value(parent));
         String revised=AnalysisFixtures.ATTRIBUTES.replace("BURGUNDY","BLUE");
         correct(s,parent,revised).andExpect(status().isOk()).andExpect(jsonPath("$.currentRevision.revisionNumber").value(2))
@@ -99,7 +99,7 @@ class AnalysisIntegrationTest {
         mvc.perform(post(s.path()).cookie(s.cookie())).andExpect(status().isForbidden());
         verifyNoInteractions(provider);
         var ready=source(true);var response=start(ready).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        String parent=json.readTree(response).path("currentRevision").path("id").asText();
+        String parent=json.readTree(response).path("currentRevision").path("id").asString();
         correct(ready,parent,AnalysisFixtures.ATTRIBUTES.replace("BURGUNDY","sensitive inference")).andExpect(status().isBadRequest());
         correct(ready,parent,AnalysisFixtures.ATTRIBUTES.replace("\"subcategory\":\"MIDI_DRESS\",", "")).andExpect(status().isBadRequest());
         mvc.perform(post(ready.path()+"/revisions").cookie(ready.cookie()).header("X-Source-Request","1").contentType("application/json")
@@ -163,7 +163,7 @@ class AnalysisIntegrationTest {
         verify(provider,times(2)).analyse(any());
     }
     @Test void cleanAndV4UpgradePreservePriorChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("analysis_upgrade").schemas("analysis_upgrade");
         config.target("4").load().migrate();
         var prior=jdbc.queryForList("SELECT checksum FROM analysis_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);

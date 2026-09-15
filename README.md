@@ -127,3 +127,9 @@ A successful response contains `COMPLETED` and AI revision 1. Repeating POST ret
 Normal CI uses deterministic fake embeddings and mocked SDK responses; it never calls the live provider. Embeddings default to disabled. Enable explicitly with `EMBEDDING_PROVIDER=openai`, reuse `OPENAI_API_KEY` from your secret environment, and optionally set `OPENAI_EMBEDDING_MODEL` (default `text-embedding-3-small`). Storage and requested output are fixed at 1536 dimensions; changing the dimension requires a migration. No new public endpoint is added.
 
 Internal `EnsureProductEmbedding.prepareBatch` prepares up to 50 existing products. `RetrieveCompatibilityCandidates` uses the owned SourceItem's current analysis and persisted market. Vector similarity only orders retrieval candidates; it is not Couple Match Score. See [embedding/retrieval architecture](docs/architecture/embedding-candidate-retrieval-foundation.md) for eligibility, versioning and recovery limits.
+
+### Match sessions
+
+After source analysis completes, POST `/api/v1/match-sessions` with the same anonymous owner cookie, `X-Source-Request: 1`, a UUID `Idempotency-Key`, and JSON `sourceItemId`, `analysisRevisionId`, `partnerTarget`, optional `matchMode` (default COORDINATED), and `sameRetailerOnly` (default false). GET `/api/v1/match-sessions/{id}` reads persisted results. Existing narrow-path cookies are upgraded by an owned source GET first.
+
+Matching defaults are 50 pre-ranking candidates, 12 results and minimum score 60 under `coupleoutfit.matching`. See [matching/ranking foundation](docs/architecture/matching-ranking-foundation.md) for exact scoring, lifecycle, API semantics and limitations.

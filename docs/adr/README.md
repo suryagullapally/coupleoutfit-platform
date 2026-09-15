@@ -18,4 +18,9 @@ Use `ADR-NNN-short-kebab-case-title.md`, preserving approved identifiers and dec
 - [ADR-025 — Embedding versioning](ADR-025-embedding-versioning.md)
 - [ADR-026 — Compatibility-neutral retrieval](ADR-026-compatibility-neutral-retrieval.md)
 
+- [ADR-027 — Couple Match Score ownership](ADR-027-couple-match-score-ownership.md)
+- [ADR-028 — MatchSession reproducibility](ADR-028-match-session-reproducibility.md)
+- [ADR-029 — Match modes as ranking strategies](ADR-029-match-mode-strategies.md)
+- [ADR-030 — Same-retailer market semantics](ADR-030-same-retailer-market-semantics.md)
+
 Numbering comes from the approved implementation brief; missing numbers are not placeholder decisions.

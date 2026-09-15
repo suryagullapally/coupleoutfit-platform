@@ -42,6 +42,10 @@ management:
         readiness:
           include: readinessState,db
 coupleoutfit:
+  matching:
+    candidate-limit: 50
+    result-limit: 12
+    minimum-score: 60
   ai:
     embeddings:
       provider: ${EMBEDDING_PROVIDER:disabled}

@@ -2,8 +2,6 @@ package com.coupleoutfit.analysis.infrastructure;
 
 import com.coupleoutfit.analysis.domain.*;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 import java.util.UUID;
 
