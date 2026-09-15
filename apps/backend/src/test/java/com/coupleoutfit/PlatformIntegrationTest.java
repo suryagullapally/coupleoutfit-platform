@@ -33,11 +33,11 @@ class PlatformIntegrationTest {
                 .isEqualTo("vector");
         assertThat(jdbc.queryForObject("SELECT success FROM flyway_schema_history WHERE version = '1'", Boolean.class)).isTrue();
         assertThat(jdbc.queryForList("SELECT tablename FROM pg_tables WHERE schemaname = 'public'", String.class))
-                .containsExactlyInAnyOrder("flyway_schema_history", "country", "currency", "locale", "retailer", "retailer_market", "product", "product_offer", "product_variant", "source_item", "source_asset", "source_url", "clothing_analysis", "analysis_revision");
+                .containsExactlyInAnyOrder("flyway_schema_history", "country", "currency", "locale", "retailer", "retailer_market", "product", "product_offer", "product_variant", "source_item", "source_asset", "source_url", "clothing_analysis", "analysis_revision", "product_embedding", "analysis_embedding");
     }
 
     @Test void referenceDataAndMigrationHistoryExist() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class)).containsExactly("1", "2", "3", "4", "5");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class)).containsExactly("1", "2", "3", "4", "5", "6");
         assertThat(jdbc.queryForObject("SELECT name FROM country WHERE code='GB' AND active", String.class)).isEqualTo("United Kingdom");
         assertThat(jdbc.queryForObject("SELECT minor_unit_digits FROM currency WHERE code='GBP' AND active", Integer.class)).isEqualTo(2);
         assertThat(jdbc.queryForObject("SELECT code FROM locale WHERE country_code='GB' AND default_currency_code='GBP' AND active", String.class)).isEqualTo("en-GB");

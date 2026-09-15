@@ -120,3 +120,10 @@ curl -sS -b /tmp/coupleoutfit-cookies \
 ```
 
 A successful response contains `COMPLETED` and AI revision 1. Repeating POST returns the existing result without another provider call. Without provider configuration it fails safely with `ANALYSIS_PROVIDER_UNAVAILABLE`. A correction POST to `/analysis/revisions` accepts `parentRevisionId` plus the full returned `attributes` object; stale parents return 409. See [clothing analysis architecture](docs/architecture/clothing-analysis-foundation.md) for schema, retry limits, privacy, pending production R2 integration and recovery limitations.
+
+
+### Embeddings and internal candidate retrieval (Prompt 006)
+
+Normal CI uses deterministic fake embeddings and mocked SDK responses; it never calls the live provider. Embeddings default to disabled. Enable explicitly with `EMBEDDING_PROVIDER=openai`, reuse `OPENAI_API_KEY` from your secret environment, and optionally set `OPENAI_EMBEDDING_MODEL` (default `text-embedding-3-small`). Storage and requested output are fixed at 1536 dimensions; changing the dimension requires a migration. No new public endpoint is added.
+
+Internal `EnsureProductEmbedding.prepareBatch` prepares up to 50 existing products. `RetrieveCompatibilityCandidates` uses the owned SourceItem's current analysis and persisted market. Vector similarity only orders retrieval candidates; it is not Couple Match Score. See [embedding/retrieval architecture](docs/architecture/embedding-candidate-retrieval-foundation.md) for eligibility, versioning and recovery limits.
