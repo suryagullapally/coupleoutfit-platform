@@ -42,6 +42,11 @@ management:
         readiness:
           include: readinessState,db
 coupleoutfit:
+  feed:
+    batch-size: 500
+    max-bytes: 67108864
+    max-rejected-rows: 1000
+    local-root: .local/affiliate-feeds
   matching:
     candidate-limit: 50
     result-limit: 12

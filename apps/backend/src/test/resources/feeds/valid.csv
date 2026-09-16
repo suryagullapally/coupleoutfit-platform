@@ -1,0 +1,4 @@
+retailer_product_id,title,brand,price,currency,product_url,affiliate_url,image_url,availability,category,target,color,pattern,material,fit,formality,seasonality,style_tags
+A,Navy shirt,Fixture brand,49.99,GBP,https://example.com/A,https://network.example/click?id=A,https://images.example.com/A.jpg,in stock,shirt,men,blue,solid,cotton,regular,smart,winter,elegant
+B,Red dress,Fixture brand,49.99,GBP,https://example.com/B,https://network.example/click?id=B,https://images.example.com/B.jpg,out of stock,dress,women,red,solid,cotton,regular,smart,winter,elegant
+C,Unpriced shirt,Fixture brand,,,https://example.com/C,https://network.example/click?id=C,https://images.example.com/C.jpg,unknown,shirt,men,navy blue,solid,cotton,regular,smart,winter,elegant

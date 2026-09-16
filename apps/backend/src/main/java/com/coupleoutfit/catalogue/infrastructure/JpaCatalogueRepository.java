@@ -26,6 +26,15 @@ public class JpaCatalogueRepository implements CatalogueRepository {
     }
 
     @Override @Transactional
+    public Product updateProduct(Product product) {
+        var existing=required(em.find(ProductEntity.class,product.id(),LockModeType.PESSIMISTIC_WRITE),"Product not found.");
+        if(!existing.retailerId.equals(product.retailerId()) || !existing.createdAt.equals(product.createdAt()))
+            throw new CatalogueWriteException("Product identity cannot be reassigned.");
+        if(product.updatedAt().isBefore(existing.updatedAt))throw new CatalogueWriteException("Stale product update.");
+        existing.update(product);em.flush();return existing.toDomain();
+    }
+
+    @Override @Transactional
     public ProductOffer upsertOffer(ProductOffer offer) {
         // Serialize natural-key writes per market, including a first insert with no offer row yet.
         var market = required(em.find(RetailerMarketEntity.class, offer.retailerMarketId(), LockModeType.PESSIMISTIC_WRITE), "Retailer market not found.").toDomain();

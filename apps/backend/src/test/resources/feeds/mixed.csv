@@ -1,0 +1,10 @@
+retailer_product_id,title,brand,price,currency,product_url,affiliate_url,image_url,availability,category,target,color,pattern,material,fit,formality,seasonality,style_tags
+A,Navy shirt,Fixture brand,49.99,GBP,https://example.com/A,https://network.example/click?id=A,https://images.example.com/A.jpg,in stock,shirt,men,blue,solid,cotton,regular,smart,winter,elegant
+B,Red dress,Fixture brand,49.99,GBP,https://example.com/B,https://network.example/click?id=B,https://images.example.com/B.jpg,out of stock,dress,women,red,solid,cotton,regular,smart,winter,elegant
+C,Unpriced shirt,Fixture brand,,,https://example.com/C,https://network.example/click?id=C,https://images.example.com/C.jpg,unknown,shirt,men,navy blue,solid,cotton,regular,smart,winter,elegant
+D,Unknown availability,Fixture brand,49.99,GBP,https://example.com/D,https://network.example/click?id=D,https://images.example.com/D.jpg,,shirt,men,navy blue,solid,cotton,regular,smart,winter,elegant
+A,Navy shirt,Fixture brand,44.99,GBP,https://example.com/A,https://network.example/click?id=A,https://images.example.com/A.jpg,in stock,shirt,men,blue,solid,cotton,regular,smart,winter,elegant
+F,Wrong currency,Fixture brand,49.99,INR,https://example.com/F,https://network.example/click?id=F,https://images.example.com/F.jpg,in stock,shirt,men,navy blue,solid,cotton,regular,smart,winter,elegant
+G,Unsupported category,Fixture brand,49.99,GBP,https://example.com/G,https://network.example/click?id=G,https://images.example.com/G.jpg,in stock,gadgets,men,navy blue,solid,cotton,regular,smart,winter,elegant
+H,Bad price,Fixture brand,n/a,GBP,https://example.com/H,https://network.example/click?id=H,https://images.example.com/H.jpg,in stock,shirt,men,navy blue,solid,cotton,regular,smart,winter,elegant
+I,Unknown target,Fixture brand,49.99,GBP,https://example.com/I,https://network.example/click?id=I,https://images.example.com/I.jpg,in stock,shirt,unisex,navy blue,solid,cotton,regular,smart,winter,elegant

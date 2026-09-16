@@ -23,4 +23,9 @@ Use `ADR-NNN-short-kebab-case-title.md`, preserving approved identifiers and dec
 - [ADR-029 — Match modes as ranking strategies](ADR-029-match-mode-strategies.md)
 - [ADR-030 — Same-retailer market semantics](ADR-030-same-retailer-market-semantics.md)
 
+- [ADR-031 — Market-specific affiliate programmes](ADR-031-market-specific-affiliate-programmes.md)
+- [ADR-032 — Deterministic feed ingestion](ADR-032-deterministic-feed-ingestion.md)
+- [ADR-033 — Feed absence is staleness, not deletion](ADR-033-feed-absence-staleness.md)
+- [ADR-034 — Commercial updates preserve fashion embeddings](ADR-034-commercial-updates-and-embeddings.md)
+
 Numbering comes from the approved implementation brief; missing numbers are not placeholder decisions.

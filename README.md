@@ -133,3 +133,9 @@ Internal `EnsureProductEmbedding.prepareBatch` prepares up to 50 existing produc
 After source analysis completes, POST `/api/v1/match-sessions` with the same anonymous owner cookie, `X-Source-Request: 1`, a UUID `Idempotency-Key`, and JSON `sourceItemId`, `analysisRevisionId`, `partnerTarget`, optional `matchMode` (default COORDINATED), and `sameRetailerOnly` (default false). GET `/api/v1/match-sessions/{id}` reads persisted results. Existing narrow-path cookies are upgraded by an owned source GET first.
 
 Matching defaults are 50 pre-ranking candidates, 12 results and minimum score 60 under `coupleoutfit.matching`. See [matching/ranking foundation](docs/architecture/matching-ranking-foundation.md) for exact scoring, lifecycle, API semantics and limitations.
+
+### Local affiliate feed fixtures (Prompt 008)
+
+Run `./mvnw --batch-mode --no-transfer-progress -Dtest=FeedDomainTest,FeedNormalizerTest,CsvFeedTest,FeedIntegrationTest test` from `apps/backend` with Java 21 and Docker. Tests import fictitious CSV fixtures into disposable PostgreSQL, including repeated imports, price/style updates, missing prices and failed-run/stale safety. No affiliate credentials or live AI calls are required.
+
+Internal execution is `FeedImportService.run(feedId)`. For an explicitly configured local feed, place its CSV beneath `.local/affiliate-feeds` and start with the local profile plus `--coupleoutfit.feed.local-run-id=<feed UUID>` (a Spring application argument). Definitions must already exist through the internal configuration repository; fixtures are not production seeds. No import HTTP endpoint or scheduler is added. See [affiliate feed ingestion architecture](docs/architecture/affiliate-feed-ingestion-foundation.md) for mapping, limits and recovery behavior.
