@@ -184,7 +184,7 @@ class CompatibilityIntegrationTest {
         assertThatThrownBy(()->jdbc.update("UPDATE analysis_embedding SET analysis_revision_id=? WHERE analysis_revision_id=?",UUID.randomUUID(),revision.id())).isInstanceOf(org.springframework.dao.DataAccessException.class);
     }
     @Test void migrationColumnsKeysAndUpgradeOverV5PreserveChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8","9");
         assertThat(jdbc.queryForObject("SELECT format_type(atttypid,atttypmod) FROM pg_attribute WHERE attrelid='product_embedding'::regclass AND attname='embedding'",String.class)).isEqualTo("vector(1536)");
         var f=fixture("BLUE");products.ensure(f.product().id());
         assertThatThrownBy(()->jdbc.update("INSERT INTO product_embedding SELECT gen_random_uuid(),product_id,embedding_type,provider,model,dimensions,descriptor_version,source_version,descriptor_hash,source_updated_at,embedding,provider_request_id,created_at,updated_at,completed_at FROM product_embedding")).isInstanceOf(org.springframework.dao.DataAccessException.class);

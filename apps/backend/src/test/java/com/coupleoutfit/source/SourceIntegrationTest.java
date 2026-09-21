@@ -217,7 +217,7 @@ class SourceIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT currency_code FROM source_item",String.class)).isEqualTo("GBP");
     }
     @Test void cleanAndExistingV3MigrationsPreserveAllPriorChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8","9");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("source_upgrade").schemas("source_upgrade");
         config.target("3").load().migrate();
         var checksums=jdbc.queryForList("SELECT checksum FROM source_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);

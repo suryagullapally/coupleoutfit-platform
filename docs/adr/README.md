@@ -28,4 +28,9 @@ Use `ADR-NNN-short-kebab-case-title.md`, preserving approved identifiers and dec
 - [ADR-033 — Feed absence is staleness, not deletion](ADR-033-feed-absence-staleness.md)
 - [ADR-034 — Commercial updates preserve fashion embeddings](ADR-034-commercial-updates-and-embeddings.md)
 
+- [ADR-035 — CoupleOutfit-owned purchase links](ADR-035-owned-purchase-links.md)
+- [ADR-036 — Opaque purchase tokens](ADR-036-opaque-purchase-tokens.md)
+- [ADR-037 — Click before redirect](ADR-037-click-before-redirect.md)
+- [ADR-038 — Current affiliate destination](ADR-038-current-affiliate-destination.md)
+
 Numbering comes from the approved implementation brief; missing numbers are not placeholder decisions.

@@ -204,7 +204,7 @@ class MatchingIntegrationTest {
         assertThat(failed.status()).isEqualTo(MatchStatus.FAILED);assertThat(failed.failureCode()).isEqualTo("MATCH_RETRIEVAL_FAILED");assertThat(sessions.results(failed.id())).isEmpty();
     }
     @Test void migrationUpgradeConstraintsAndAtomicCompletion() throws Exception {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8","9");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("matching_upgrade").schemas("matching_upgrade");
         config.target("6").load().migrate();var checksums=jdbc.queryForList("SELECT checksum FROM matching_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);
         assertThat(checksums).containsExactly(-929483003,-362163080,-360589483,-599056603,85417613,-976671557);

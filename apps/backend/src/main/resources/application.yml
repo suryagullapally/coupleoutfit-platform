@@ -42,6 +42,9 @@ management:
         readiness:
           include: readinessState,db
 coupleoutfit:
+  purchase:
+    lifetime: P30D
+    token-key: ${PURCHASE_TOKEN_KEY:}
   feed:
     batch-size: 500
     max-bytes: 67108864

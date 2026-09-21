@@ -163,7 +163,7 @@ class AnalysisIntegrationTest {
         verify(provider,times(2)).analyse(any());
     }
     @Test void cleanAndV4UpgradePreservePriorChecksums() {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8","9");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("analysis_upgrade").schemas("analysis_upgrade");
         config.target("4").load().migrate();
         var prior=jdbc.queryForList("SELECT checksum FROM analysis_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);

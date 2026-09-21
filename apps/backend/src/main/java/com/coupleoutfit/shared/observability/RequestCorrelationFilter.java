@@ -38,6 +38,10 @@ public class RequestCorrelationFilter extends OncePerRequestFilter {
         } finally {
             // Query strings, bodies, cookies and authorization headers are deliberately excluded.
             String path = request.getRequestURI().replaceAll("[\\r\\n\\t]", "_");
+            try {
+                String decodedPath=java.net.URLDecoder.decode(path,java.nio.charset.StandardCharsets.UTF_8);
+                if (decodedPath.startsWith(request.getContextPath()+"/go")) path="/go/[redacted]";
+            } catch (IllegalArgumentException invalidEncoding) { path="/[invalid-path]"; }
             if (path.length() > 512) path = path.substring(0, 512);
             log.atInfo().addKeyValue("httpMethod", request.getMethod())
                 .addKeyValue("httpPath", path).addKeyValue("httpStatus", response.getStatus())

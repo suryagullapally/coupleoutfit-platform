@@ -11,7 +11,7 @@ class FeatureArchitectureTest {
         noClasses().that().resideInAnyPackage("..domain..", "..application..")
                 .should().dependOnClassesThat().resideInAnyPackage("..api..", "..infrastructure..", "org.springframework..", "jakarta.persistence..", "com.openai..", "java.net.http..", "okhttp3..", "com.cloudflare..", "software.amazon.awssdk..")
                 .check(classes);
-        noClasses().that().resideInAnyPackage("..analysis..", "..compatibility..", "..matching..")
+        noClasses().that().resideInAnyPackage("..analysis..", "..compatibility..", "..matching.domain..", "..matching.application..", "..matching.infrastructure..")
                 .should().dependOnClassesThat().resideInAnyPackage("..affiliate..", "..feed..").check(classes);
         noClasses().that().resideInAPackage("..api..")
                 .should().dependOnClassesThat().resideInAPackage("..infrastructure..").check(classes);

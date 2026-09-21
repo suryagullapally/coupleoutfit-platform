@@ -158,7 +158,7 @@ class FeedIntegrationTest {
         assertThat(failed.failureCode()).isEqualTo("FEED_TOO_MANY_REJECTIONS");assertThat(failed.counters().itemsRead()).isEqualTo(2);
     }
     @Test void migrationUpgradeConstraintsAndRejectionThreshold()throws Exception {
-        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8");
+        assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank",String.class)).containsExactly("1","2","3","4","5","6","7","8","9");
         var config=Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).defaultSchema("feed_upgrade").schemas("feed_upgrade");config.target("7").load().migrate();
         var old=jdbc.queryForList("SELECT checksum FROM feed_upgrade.flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank",Integer.class);
         assertThat(old).containsExactly(-929483003,-362163080,-360589483,-599056603,85417613,-976671557,-1417818194);

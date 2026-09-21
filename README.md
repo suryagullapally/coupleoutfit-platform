@@ -139,3 +139,11 @@ Matching defaults are 50 pre-ranking candidates, 12 results and minimum score 60
 Run `./mvnw --batch-mode --no-transfer-progress -Dtest=FeedDomainTest,FeedNormalizerTest,CsvFeedTest,FeedIntegrationTest test` from `apps/backend` with Java 21 and Docker. Tests import fictitious CSV fixtures into disposable PostgreSQL, including repeated imports, price/style updates, missing prices and failed-run/stale safety. No affiliate credentials or live AI calls are required.
 
 Internal execution is `FeedImportService.run(feedId)`. For an explicitly configured local feed, place its CSV beneath `.local/affiliate-feeds` and start with the local profile plus `--coupleoutfit.feed.local-run-id=<feed UUID>` (a Spring application argument). Definitions must already exist through the internal configuration repository; fixtures are not production seeds. No import HTTP endpoint or scheduler is added. See [affiliate feed ingestion architecture](docs/architecture/affiliate-feed-ingestion-foundation.md) for mapping, limits and recovery behavior.
+
+### Local purchase redirects (Prompt 009)
+
+Run `./mvnw --batch-mode --no-transfer-progress -Dtest=PurchaseDomainTest,PurchaseIntegrationTest test` from `apps/backend` with Java 21 and Docker. Fixtures exercise owned match responses, anonymous `/go/{token}` redirects, click persistence, current URL changes, disabled integrations and unsafe destinations. Tests never follow the external Location or use real affiliate credentials.
+
+For manual local checks, configure an approved programme/feed-backed offer and use its owned match response's `purchase.url`. Request that path with `curl -i` (without `-L`): expect 302, the configured test Location and `Cache-Control: no-store`. `curl -I` returns 204 without recording a click. Missing/unsafe destinations return `purchase.available=false`. No public configuration or import endpoint is added.
+
+`PURCHASE_TOKEN_KEY` must contain Base64 encoding of at least 32 random bytes in staging/production. Keep it stable in secret configuration; local/test defaults are ephemeral unless explicitly configured. `/go/*` must route to the backend and bypass CDN caching. See [purchase-link architecture](docs/architecture/affiliate-click-and-purchase-link-foundation.md) for host approval, privacy, key lifecycle and retention limitations.
