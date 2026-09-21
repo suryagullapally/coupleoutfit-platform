@@ -6,7 +6,7 @@ function safeToken(value: unknown): string | undefined {
 }
 
 /** JSON-only transport. T describes a caller's contract; it does not validate runtime payloads. */
-export function createApiClient(baseUrl: string, fetcher: typeof fetch = fetch) {
+export function createApiClient(baseUrl: string, fetcher: typeof fetch = fetch, credentials: RequestCredentials = "omit") {
   const base = new URL(baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
   if (!["http:", "https:"].includes(base.protocol) || base.username || base.password || base.search || base.hash) {
     throw new TypeError("API base must be an HTTP(S) URL without credentials, query, or fragment.");
@@ -29,7 +29,7 @@ export function createApiClient(baseUrl: string, fetcher: typeof fetch = fetch) 
       const body = json === undefined ? undefined : JSON.stringify(json);
       let response: Response;
       try {
-        response = await fetcher(url, { ...init, headers, body, credentials: "omit" });
+        response = await fetcher(url, { ...init, headers, body, credentials });
       } catch (error) {
         if (init.signal?.aborted || (error instanceof Error && error.name === "AbortError")) throw error;
         throw new NetworkError();
